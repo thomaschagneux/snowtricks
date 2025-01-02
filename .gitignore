@@ -1,3 +1,5 @@
+### PhpStorm folder
+.idea/
 
 ###> symfony/framework-bundle ###
 /.env.local
