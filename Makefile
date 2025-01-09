@@ -32,5 +32,9 @@ clean: ## Nettoie les fichiers de cache et logs
 	$(CONSOLE) c:c
 	$(CONSOLE) c:w
 
-quality:
+quality: clean
+	vendor/bin/php-cs-fixer fix
 	vendor/bin/phpstan analyse
+
+add: quality
+	git add .
