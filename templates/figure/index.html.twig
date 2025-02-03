@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Figure index{% endblock %}
+
+{% block body %}
+    <h1>Figure index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>ShortDescription</th>
+                <th>Content</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for figure in figures %}
+            <tr>
+                <td>{{ figure.id }}</td>
+                <td>{{ figure.name }}</td>
+                <td>{{ figure.shortDescription }}</td>
+                <td>{{ figure.content }}</td>
+                <td>
+                    <a href="{{ path('app_figure_show', {'id': figure.id}) }}">show</a>
+                    <a href="{{ path('app_figure_edit', {'id': figure.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_figure_new') }}">Create new</a>
+{% endblock %}
