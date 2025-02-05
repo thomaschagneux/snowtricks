@@ -5,7 +5,6 @@ namespace App\Form;
 use App\Entity\Figure;
 use App\Entity\FigureGroup;
 use App\Entity\Media;
-use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -35,13 +34,8 @@ class FigureType extends AbstractType
             ->add('media', EntityType::class, [
                 'label' => 'Media',
                 'class' => Media::class,
-                'choice_label' => 'path',
+                'choice_label' => fn (Media $entity) => $entity->getPath() ?: $entity->getUrl(),
                 'multiple' => true,
-            ])
-            ->add('user', EntityType::class, [
-                'label' => 'Utilisateur',
-                'class' => User::class,
-                'choice_label' => 'email',
             ])
         ;
     }

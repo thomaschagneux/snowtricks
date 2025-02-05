@@ -28,7 +28,7 @@ class Media
     /**
      * @var Collection<int, Figure>
      */
-    #[ORM\ManyToMany(targetEntity: Figure::class, inversedBy: 'media')]
+    #[ORM\ManyToMany(targetEntity: Figure::class, mappedBy: 'media')]
     private Collection $figures;
 
     public function __construct()
