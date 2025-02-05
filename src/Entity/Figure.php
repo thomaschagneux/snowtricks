@@ -31,7 +31,8 @@ class Figure
     /**
      * @var Collection<int, Media>
      */
-    #[ORM\ManyToMany(targetEntity: Media::class, mappedBy: 'figures')]
+    #[ORM\ManyToMany(targetEntity: Media::class, inversedBy: 'figures')]
+    #[ORM\JoinTable(name: 'media_figure')]
     private Collection $media;
 
     #[ORM\ManyToOne(inversedBy: 'figures')]
@@ -130,6 +131,24 @@ class Figure
         return $this;
     }
 
+    /**
+     * @param Collection<int, Media> $medias
+     */
+    public function setMediaCollection(Collection $medias): void
+    {
+        foreach ($this->media as $existingMedia) {
+            if (!in_array($existingMedia, $medias->toArray(), true)) {
+                $this->removeMedium($existingMedia);
+            }
+        }
+
+        foreach ($medias as $media) {
+            if (!$this->media->contains($media)) {
+                $this->addMedium($media);
+            }
+        }
+    }
+
     public function getUser(): ?User
     {
         return $this->user;
@@ -163,7 +182,6 @@ class Figure
     public function removeComment(Comment $comment): static
     {
         if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
             if ($comment->getFigure() === $this) {
                 $comment->setFigure(null);
             }
