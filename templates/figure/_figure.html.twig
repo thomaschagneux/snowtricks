@@ -1,0 +1,24 @@
+<div class="card card-figure">
+    <div class="card-header" style="height: 200px; overflow: hidden;"> {# Hauteur fixe pour le header #}
+
+        {% if figure.media is not empty %}
+            {% set link = figure.media.first.path ? figure.media.first.path : figure.media.first.url %}
+        {% endif %}
+        <img src="{{ asset(link ?? '') }}" alt="image failed to load"
+             class="img-fluid w-100 h-100"
+             style="object-fit: cover;">
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col col-12 col-md-9 p-0">
+                <a href="{{ path('app_figure_show', {'id': figure.id}) }}">{{ figure.name }}</a>
+            </div>
+            <div class="col col-12 col-md-1 p-0 m-auto">
+                <a href="{{ path('app_figure_edit', {'id': figure.id}) }}" class="text-dark"><i class="fa-solid fa-pen"></i></a>
+            </div>
+            <div class="col col-12 col-md-1 p-0">
+                <a href="{{ path('app_figure_delete', {'id': figure.id}) }}" class="text-dark"><i class="fa-solid fa-trash"></i></a>
+            </div>
+        </div>
+    </div>
+</div>

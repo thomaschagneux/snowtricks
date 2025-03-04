@@ -1,0 +1,24 @@
+<section id="tricks-section" class="tricks-section">
+    <div class="container">
+        <div class="row g-4 js-figures-container"> {# g-4 pour ajouter un espacement entre les cartes #}
+            {% if figures is defined and figures is not null %}
+                {% for figure in figures %}
+                    <div class="col-6 col-lg-2-4 js-figure {% if loop.index > 15 %}d-none{% endif %}"> {# 5 cartes par ligne en grand écran #}
+                        {% include 'figure/_figure.html.twig' %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col col-12 col-md-10 d-flex justify-content-center">
+            <button class="btn btn-secondary btn-sm" id="load-more-figures">Load more</button>
+        </div>
+        <div class="col col-12 col-md-2 d-flex justify-content-end">
+            <a href="#hero-section" class="text-dark p-3">
+                <i class="fa-solid fa-arrow-up fa-2x"></i>
+            </a>
+        </div>
+    </div>
+</section>
