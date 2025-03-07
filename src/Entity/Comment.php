@@ -7,29 +7,16 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
-class Comment
+class Comment extends AbstractEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
-
-    #[ORM\Column(type: Types::GUID)]
-    private ?string $sequenceNumber = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     private ?Figure $figure = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     private ?User $user = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getContent(): ?string
     {
@@ -39,18 +26,6 @@ class Comment
     public function setContent(string $content): static
     {
         $this->content = $content;
-
-        return $this;
-    }
-
-    public function getSequenceNumber(): ?string
-    {
-        return $this->sequenceNumber;
-    }
-
-    public function setSequenceNumber(string $sequenceNumber): static
-    {
-        $this->sequenceNumber = $sequenceNumber;
 
         return $this;
     }

@@ -1,0 +1,32 @@
+<div class="container-fluid mt-4">
+    <h3>Ajouter un commentaire</h3>
+
+    {% if commentForm %}
+        {{ form_start(commentForm) }}
+        <div class="mb-3">
+            {{ form_widget(commentForm.content) }}
+        </div>
+        <button type="submit" class="btn btn-primary">Envoyer</button>
+        {{ form_end(commentForm) }}
+    {% else %}
+        <p class="text-muted">Vous devez être connecté pour laisser un commentaire.</p>
+    {% endif %}
+</div>
+
+<hr>
+
+<h3>Commentaires</h3>
+<div class="list-group">
+    {% for comment in comments %}
+        <div class="list-group-item d-flex align-items-center">
+            <img src="{{ comment.avatar }}" alt="Avatar de {{ comment.author }}" class="rounded-circle me-3" width="50" height="50">
+
+            <div>
+                <strong>{{ comment.author }}</strong>
+                <p class="mb-0">{{ comment.content }}</p>
+            </div>
+        </div>
+    {% else %}
+        <p>Aucun commentaire pour le moment.</p>
+    {% endfor %}
+</div>

@@ -37,6 +37,12 @@ class FigureType extends AbstractType
                 'choice_label' => fn (Media $entity) => $entity->getPath() ?: $entity->getUrl(),
                 'multiple' => true,
             ])
+            ->add('featuredMedia', EntityType::class, [
+                'label' => 'Featured media',
+                'class' => Media::class,
+                'choice_label' => fn (Media $entity) => $entity->getPath() ?: $entity->getUrl(),
+                'multiple' => false,
+            ])
         ;
     }
 

@@ -8,4 +8,9 @@
             $(this).fadeOut();
         }
     });
+
+        $("#toggleMedias").click(function () {
+            $("#mediasContainer").toggleClass("d-none");
+        });
+
 });

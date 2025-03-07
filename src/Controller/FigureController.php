@@ -6,6 +6,8 @@ use App\Entity\Figure;
 use App\Entity\User;
 use App\Form\FigureType;
 use App\Repository\FigureRepository;
+use App\Service\CommentService;
+use App\Service\MediaService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,11 +41,34 @@ final class FigureController extends AbstractController
         return $this->handleFigureForm($request, $figure);
     }
 
-    #[Route('/{id}', name: 'app_figure_show', methods: ['GET'])]
-    public function show(Figure $figure): Response
+    #[Route('/{id}', name: 'app_figure_show', methods: ['GET', 'POST'])]
+    public function show(Figure $figure, Request $request, MediaService $mediaService, CommentService $commentService): Response
     {
+        $mediaData = $mediaService->prepareMediaData($figure->getMedia());
+        $featuredImage = $mediaService->getFeaturedImage($figure);
+
+        $user = $this->getUser();
+        $form = null;
+
+        if ($user instanceof User) {
+            $form = $commentService->createCommentForm($figure, $user);
+            $form->handleRequest($request);
+
+            if ($commentService->handleCommentSubmission($form)) {
+                $this->addFlash('success', 'Votre commentaire a été ajouté.');
+
+                return $this->redirectToRoute('app_figure_show', ['id' => $figure->getId()]);
+            }
+        }
+
+        $commentsData = $commentService->prepareComments($figure->getComments());
+
         return $this->render('figure/show.html.twig', [
             'figure' => $figure,
+            'medias' => $mediaData,
+            'featuredImage' => $featuredImage,
+            'comments' => $commentsData,
+            'commentForm' => $form?->createView(),
         ]);
     }
 
@@ -53,15 +78,20 @@ final class FigureController extends AbstractController
         return $this->handleFigureForm($request, $figure);
     }
 
-    #[Route('/{id}', name: 'app_figure_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'app_figure_delete', methods: ['POST'])]
     public function delete(Request $request, Figure $figure): Response
     {
         if ($this->isCsrfTokenValid('delete'.$figure->getId(), $request->getPayload()->getString('_token'))) {
+            $comments = $figure->getComments();
+            foreach ($comments as $comment) {
+                $this->entityManager->remove($comment);
+            }
+
             $this->entityManager->remove($figure);
             $this->entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_figure_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_home', []);
     }
 
     private function handleFigureForm(Request $request, Figure $figure): RedirectResponse|Response
@@ -87,7 +117,7 @@ final class FigureController extends AbstractController
             $this->entityManager->persist($figure);
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('app_figure_index');
+            return $this->redirectToRoute('app_home');
         }
 
         return $this->render('figure/_form.html.twig', [

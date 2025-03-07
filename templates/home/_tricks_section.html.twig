@@ -1,6 +1,6 @@
 <section id="tricks-section" class="tricks-section">
     <div class="container">
-        <div class="row g-4 js-figures-container"> {# g-4 pour ajouter un espacement entre les cartes #}
+        <div class="row g-4 js-figures-container">
             {% if figures is defined and figures is not null %}
                 {% for figure in figures %}
                     <div class="col-6 col-lg-2-4 js-figure {% if loop.index > 15 %}d-none{% endif %}"> {# 5 cartes par ligne en grand écran #}

@@ -1,0 +1,35 @@
+<div class="row container-fluid mb-3">
+    <button class="d-none  d-md-block">bouton</button>
+    <h1 class="test">test</h1>
+    <h1 class="test"></h1>
+    <h1 class="test"></h1>
+    {% if medias is defined and medias is not empty %}
+        
+        {% for media in medias %}
+            <div class="col col-12 col-md-2">
+                {% if media.category == 'image' %}
+                    <img src="{{ asset(media.link) }}" alt="Image" class="w-100">
+                {% elseif media.category == 'video' %}
+                    {% if media.isExternal %}
+                        <iframe class="h-auto w-100" src="{{ media.link }}" title="Vidéo externe"
+                                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+                        </iframe>
+                    {% else %}
+                        <video controls class="w-100">
+                            <source src="{{ asset(media.link) }}" type="{{ media.mimeType }}">
+                            Votre navigateur ne supporte pas la lecture de vidéos.
+                        </video>
+                    {% endif %}
+                {% elseif media.category == 'audio' %}
+                    <audio controls>
+                        <source src="{{ media.link }}" type="{{ media.mimeType }}">
+                        Votre navigateur ne supporte pas la lecture audio.
+                    </audio>
+                {% else %}
+                    <p>Type de média non supporté</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
