@@ -1,7 +1,9 @@
 <section id="featured-section" class="featured-section position-relative text-white text-center mb-3">
     {% if featuredImage %}
-        <div class="w-100 d-flex justify-content-center">
-            <img src="{{ asset(featuredImage) }}" alt="{{ figure.name }}" class="h-100">
+        <div class="container-fluid p-0">
+            <div class="ratio ratio-16x9">
+                <img src="{{ asset(featuredImage) }}" alt="{{ figure.name }}" class="object-fit-cover">
+            </div>
         </div>
     {% endif %}
 

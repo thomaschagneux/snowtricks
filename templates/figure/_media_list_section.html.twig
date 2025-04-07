@@ -1,35 +1,43 @@
-<div class="row container-fluid mb-3">
-    <button class="d-none  d-md-block">bouton</button>
-    <h1 class="test">test</h1>
-    <h1 class="test"></h1>
-    <h1 class="test"></h1>
-    {% if medias is defined and medias is not empty %}
-        
-        {% for media in medias %}
-            <div class="col col-12 col-md-2">
-                {% if media.category == 'image' %}
-                    <img src="{{ asset(media.link) }}" alt="Image" class="w-100">
-                {% elseif media.category == 'video' %}
-                    {% if media.isExternal %}
-                        <iframe class="h-auto w-100" src="{{ media.link }}" title="Vidéo externe"
-                                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
-                        </iframe>
-                    {% else %}
-                        <video controls class="w-100">
-                            <source src="{{ asset(media.link) }}" type="{{ media.mimeType }}">
-                            Votre navigateur ne supporte pas la lecture de vidéos.
-                        </video>
-                    {% endif %}
-                {% elseif media.category == 'audio' %}
-                    <audio controls>
-                        <source src="{{ media.link }}" type="{{ media.mimeType }}">
-                        Votre navigateur ne supporte pas la lecture audio.
-                    </audio>
-                {% else %}
-                    <p>Type de média non supporté</p>
-                {% endif %}
-            </div>
-        {% endfor %}
-    {% endif %}
+<div class="media-section mb-3">
+    <button class="btn btn-primary d-block d-md-block d-lg-none w-100 mb-3" type="button" id="toggle-medias">
+        Afficher/Masquer les médias
+    </button>
+
+    <div class="d-none d-md-none d-lg-block" id="medias-container">
+        <div class="row g-3">
+            {% if medias is defined and medias is not empty %}
+                {% for media in medias %}
+                    <div class="col col-12 col-md-12 col-lg-2">
+                        <div class="media-item h-100">
+                            {% if media.category == 'image' %}
+                                <img src="{{ asset(media.link) }}" alt="Image" class="w-100 h-100 object-fit-cover">
+                            {% elseif media.category == 'video' %}
+                                {% if media.isExternal %}
+                                    <div class="ratio ratio-16x9">
+                                        <iframe src="{{ media.link }}" title="Vidéo externe"
+                                                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+                                        </iframe>
+                                    </div>
+                                {% else %}
+                                    <video controls class="w-100">
+                                        <source src="{{ asset(media.link) }}" type="{{ media.mimeType }}">
+                                        Votre navigateur ne supporte pas la lecture de vidéos.
+                                    </video>
+                                {% endif %}
+                            {% elseif media.category == 'audio' %}
+                                <audio controls class="w-100">
+                                    <source src="{{ media.link }}" type="{{ media.mimeType }}">
+                                    Votre navigateur ne supporte pas la lecture audio.
+                                </audio>
+                            {% else %}
+                                <p>Type de média non supporté</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
 </div>

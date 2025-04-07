@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Form\FigureType;
 use App\Repository\FigureRepository;
 use App\Service\CommentService;
+use App\Service\FigureService;
 use App\Service\MediaService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -73,8 +74,22 @@ final class FigureController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_figure_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Figure $figure): Response
+    public function edit(Figure $figure, Request $request, FigureService $figureService): Response
     {
+        $editFigureForm = null;
+        $user = $this->getUser();
+
+        if ($user instanceof User) {
+            $editFigureForm = $figureService->createFigureForm($figure, $user);
+
+            $editFigureForm->handleRequest($request);
+            $figureService->handlefigureSubmission($figure, $editFigureForm);
+        } else {
+            $this->addFlash('error', 'Vous devez être connecté pour modifier une figure.');
+
+            return $this->redirectToRoute('app_login');
+        }
+
         return $this->handleFigureForm($request, $figure);
     }
 
