@@ -17,12 +17,18 @@ class MediaType extends AbstractType
             ->add('url', TextType::class, [
                 'label' => 'Url',
                 'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                ],
             ])
             ->add('file', FileType::class, [
                 'multiple' => false,
                 'label' => 'Fichier',
                 'mapped' => false,
                 'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                ],
             ])
         ;
     }

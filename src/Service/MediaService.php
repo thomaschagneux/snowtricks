@@ -5,6 +5,7 @@
 namespace App\Service;
 
 use App\Entity\Figure;
+use App\Entity\Media;
 use App\Entity\User;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Asset\Packages;
@@ -16,6 +17,11 @@ class MediaService
     ) {
     }
 
+    /**
+     * @param array<int, Media>|Collection<int, Media> $medias
+     *
+     * @return list<array<string, int|string|false|null>>
+     */
     public function prepareMediaData(array|Collection $medias): array
     {
         $mediaData = [];
@@ -29,12 +35,13 @@ class MediaService
             $category = $media->getMediaType()->getCategory();
             $isExternal = filter_var($link, FILTER_VALIDATE_URL);
 
-            if ($this->isExternalVideo($link)) {
+            if (is_string($link) && $this->isExternalVideo($link)) {
                 $category = 'video';
                 $link = $this->convertToEmbedUrl($link);
             }
 
             $mediaData[] = [
+                'id' => $media->getId(),
                 'link' => $link,
                 'category' => $category,
                 'mimeType' => $media->getMediaType()->getMimeType(),
@@ -53,7 +60,7 @@ class MediaService
         }
 
         $medias = $figure->getMedia();
-        if ($medias instanceof Collection && !$medias->isEmpty()) {
+        if (!$medias->isEmpty()) {
             $firstMedia = $medias->first();
 
             return $firstMedia->getPath() ?? $firstMedia->getUrl();

@@ -6,6 +6,7 @@ use App\Entity\Comment;
 use App\Entity\Figure;
 use App\Entity\User;
 use App\Form\CommentType;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -28,9 +29,10 @@ class CommentService
         return $this->formFactory->create(CommentType::class, $comment);
     }
 
-    public function handleCommentSubmission($form): bool
+    public function handleCommentSubmission(FormInterface $form): bool
     {
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var Comment $comment */
             $comment = $form->getData();
 
             $this->entityManager->persist($comment);
@@ -42,16 +44,21 @@ class CommentService
         return false;
     }
 
-    public function prepareComments(iterable $comments): array
+    /**
+     * @param Collection<int, Comment> $comments
+     *
+     * @return list<array<string, string|null>>
+     */
+    public function prepareComments(Collection $comments): array
     {
         $commentsData = [];
 
         foreach ($comments as $comment) {
             $user = $comment->getUser();
             $commentsData[] = [
-                'author' => $user ? $user->getFullName() : 'Anonyme',
+                'author' => $user instanceof User ? $user->getFullName() : 'Anonyme',
                 'content' => $comment->getContent(),
-                'avatar' => $user ? $this->mediaService->getProfilePicture($user) : '/images/default-avatar.png',
+                'avatar' => $user instanceof User ? $this->mediaService->getProfilePicture($user) : '/images/default-avatar.png',
             ];
         }
 

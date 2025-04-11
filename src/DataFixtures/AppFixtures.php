@@ -37,7 +37,7 @@ class AppFixtures extends Fixture
         $figureGroups = [];
         for ($i = 0; $i < 50; ++$i) {
             $figureGroup = new FigureGroup();
-            $figureGroup->setName('Figure '.$i);
+            $figureGroup->setName('Groupe figure '.$i);
             $figureGroups[] = $figureGroup;
             $manager->persist($figureGroup);
         }
@@ -98,12 +98,12 @@ class AppFixtures extends Fixture
         for ($i = 0; $i < 50; ++$i) {
             $figure = new Figure();
             $figure->setUser($user);
-            $figure->setName('Figure '.$i);
+            $figure->setName(' Nom figure '.$i);
             $figure->setFigureGroup($figureGroups[$i]);
             $figure->setMediaCollection($mediaCollection);
             $figure->setFeaturedMedia($medias[$i]);
-            $figure->setContent('figure '.$i);
-            $figure->setShortDescription('description '.$i);
+            $figure->setContent('contenu figure '.$i);
+            $figure->setShortDescription('description courte '.$i);
             $figures[] = $figure;
             $manager->persist($figure);
         }

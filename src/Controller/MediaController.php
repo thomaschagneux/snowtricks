@@ -86,14 +86,6 @@ final class MediaController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_media_show', methods: ['GET'])]
-    public function show(Media $medium): Response
-    {
-        return $this->render('media/show.html.twig', [
-            'medium' => $medium,
-        ]);
-    }
-
     #[Route('/{id}/edit', name: 'app_media_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
