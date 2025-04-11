@@ -9,13 +9,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FigureRepository::class)]
-class Figure
+class Figure extends AbstractEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
@@ -35,6 +30,10 @@ class Figure
     #[ORM\JoinTable(name: 'media_figure')]
     private Collection $media;
 
+    #[ORM\OneToOne(targetEntity: Media::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Media $featuredMedia = null;
+
     #[ORM\ManyToOne(inversedBy: 'figures')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
@@ -47,13 +46,9 @@ class Figure
 
     public function __construct()
     {
+        parent::__construct();
         $this->media = new ArrayCollection();
         $this->comments = new ArrayCollection();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getName(): ?string
@@ -147,6 +142,16 @@ class Figure
                 $this->addMedium($media);
             }
         }
+    }
+
+    public function getFeaturedMedia(): ?Media
+    {
+        return $this->featuredMedia;
+    }
+
+    public function setFeaturedMedia(?Media $featuredMedia): void
+    {
+        $this->featuredMedia = $featuredMedia;
     }
 
     public function getUser(): ?User

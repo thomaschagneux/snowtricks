@@ -89,4 +89,21 @@ class MediaType
 
         return $this;
     }
+
+    public function getCategory(): string
+    {
+        $categories = [
+            'image' => ['image/jpeg', 'image/png', 'image/gif'],
+            'video' => ['video/mp4', 'video/mpeg'],
+            'audio' => ['audio/mpeg'],
+        ];
+
+        foreach ($categories as $category => $mimeTypes) {
+            if (in_array($this->mimeType, $mimeTypes, true)) {
+                return $category;
+            }
+        }
+
+        return 'other';
+    }
 }

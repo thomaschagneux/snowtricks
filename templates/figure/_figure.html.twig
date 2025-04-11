@@ -17,7 +17,14 @@
                 <a href="{{ path('app_figure_edit', {'id': figure.id}) }}" class="text-dark"><i class="fa-solid fa-pen"></i></a>
             </div>
             <div class="col col-12 col-md-1 p-0">
-                <a href="{{ path('app_figure_delete', {'id': figure.id}) }}" class="text-dark"><i class="fa-solid fa-trash"></i></a>
+                <form method="post" action="{{ path('app_figure_delete', {'id': figure.id}) }}">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ figure.id) }}">
+                    <button class="text-dark p-0 border-0 bg-transparent">
+                        <i class="fa-solid fa-trash text-danger"></i>
+                    </button>
+                </form>
+
             </div>
         </div>
     </div>

@@ -1,0 +1,13 @@
+<section id="featured-section" class="featured-section position-relative text-white text-center mb-3">
+    {% if featuredImage %}
+        <div class="container-fluid p-0">
+            <div class="ratio ratio-16x9">
+                <img src="{{ asset(featuredImage) }}" alt="{{ figure.name }}" class="object-fit-cover">
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="container position-absolute top-50 start-50 translate-middle text-white">
+        <h1 class="fw-bold">{{ figure.name }}</h1>
+    </div>
+</section>

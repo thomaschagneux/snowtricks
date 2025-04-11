@@ -5,7 +5,9 @@ namespace App\Controller;
 use App\Entity\Figure;
 use App\Entity\User;
 use App\Form\FigureType;
-use App\Repository\FigureRepository;
+use App\Service\CommentService;
+use App\Service\FigureService;
+use App\Service\MediaService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,15 +22,8 @@ final class FigureController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
+        private readonly MediaService $mediaService,
     ) {
-    }
-
-    #[Route(name: 'app_figure_index', methods: ['GET'])]
-    public function index(FigureRepository $figureRepository): Response
-    {
-        return $this->render('figure/index.html.twig', [
-            'figures' => $figureRepository->findAll(),
-        ]);
     }
 
     #[Route('/new', name: 'app_figure_new', methods: ['GET', 'POST'])]
@@ -36,37 +31,82 @@ final class FigureController extends AbstractController
     {
         $figure = new Figure();
 
-        return $this->handleFigureForm($request, $figure);
+        return $this->handleFigureForm($request, $figure, 'add');
     }
 
-    #[Route('/{id}', name: 'app_figure_show', methods: ['GET'])]
-    public function show(Figure $figure): Response
+    #[Route('/{id}', name: 'app_figure_show', methods: ['GET', 'POST'])]
+    public function show(Figure $figure, Request $request, CommentService $commentService): Response
     {
+        $mediaData = $this->mediaService->prepareMediaData($figure->getMedia());
+        $featuredImage = $this->mediaService->getFeaturedImage($figure);
+
+        $user = $this->getUser();
+        $form = null;
+
+        if ($user instanceof User) {
+            $form = $commentService->createCommentForm($figure, $user);
+            $form->handleRequest($request);
+
+            if ($commentService->handleCommentSubmission($form)) {
+                $this->addFlash('success', 'Votre commentaire a été ajouté.');
+
+                return $this->redirectToRoute('app_figure_show', ['id' => $figure->getId()]);
+            }
+        }
+
+        $commentsData = $commentService->prepareComments($figure->getComments());
+
         return $this->render('figure/show.html.twig', [
             'figure' => $figure,
+            'medias' => $mediaData,
+            'featuredImage' => $featuredImage,
+            'comments' => $commentsData,
+            'commentForm' => $form?->createView(),
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_figure_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Figure $figure): Response
+    public function edit(Figure $figure, Request $request, FigureService $figureService): Response
     {
-        return $this->handleFigureForm($request, $figure);
+        $user = $this->getUser();
+
+        if ($user instanceof User) {
+            $editFigureForm = $figureService->createFigureForm($figure, $user, 'edit');
+            $oldFigure = clone $figure;
+            $editFigureForm->handleRequest($request);
+
+            $figureService->handlefigureSubmission($oldFigure, $editFigureForm);
+        } else {
+            $this->addFlash('error', 'Vous devez être connecté pour modifier une figure.');
+
+            return $this->redirectToRoute('app_login');
+        }
+
+        return $this->handleFigureForm($request, $figure, 'edit');
     }
 
-    #[Route('/{id}', name: 'app_figure_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'app_figure_delete', methods: ['GET', 'POST'])]
     public function delete(Request $request, Figure $figure): Response
     {
         if ($this->isCsrfTokenValid('delete'.$figure->getId(), $request->getPayload()->getString('_token'))) {
+            $comments = $figure->getComments();
+            foreach ($comments as $comment) {
+                $this->entityManager->remove($comment);
+            }
+
             $this->entityManager->remove($figure);
             $this->entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_figure_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_home', []);
     }
 
-    private function handleFigureForm(Request $request, Figure $figure): RedirectResponse|Response
+    private function handleFigureForm(Request $request, Figure $figure, ?string $action): RedirectResponse|Response
     {
-        $form = $this->createForm(FigureType::class, $figure);
+        $mediaData = $this->mediaService->prepareMediaData($figure->getMedia());
+        $featuredImage = $this->mediaService->getFeaturedImage($figure);
+
+        $form = $this->createForm(FigureType::class, $figure, ['action' => $action ?? 'add']);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -76,23 +116,27 @@ final class FigureController extends AbstractController
                 $figure->setUser($user);
             }
 
-            $formMediaData = $form->get('media')->getData();
+            if ('edit' !== $action) {
+                $formMediaData = $form->get('media')->getData();
 
-            if (null === $formMediaData) {
-                $formMediaData = [];
+                if (null === $formMediaData) {
+                    $formMediaData = [];
+                }
+                $medias = $formMediaData instanceof Collection ? $formMediaData : new ArrayCollection(is_array($formMediaData) ? $formMediaData : []);
+                $figure->setMediaCollection($medias);
             }
-            $medias = $formMediaData instanceof Collection ? $formMediaData : new ArrayCollection(is_array($formMediaData) ? $formMediaData : []);
-            $figure->setMediaCollection($medias);
 
             $this->entityManager->persist($figure);
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('app_figure_index');
+            return $this->redirectToRoute('app_home');
         }
 
         return $this->render('figure/_form.html.twig', [
             'figure' => $figure,
             'form' => $form->createView(),
+            'featuredImage' => $featuredImage,
+            'medias' => $mediaData,
         ]);
     }
 }

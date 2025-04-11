@@ -1,0 +1,13 @@
+<div class="row container-fluid mb-3">
+    <div class="row">
+        <p>{{ figure.content }}</p>
+    </div>
+    <div class="d-flex gap-2 justify-content-center mt-2">
+        <span class="badge bg-primary mx-2">Créé le : {{ figure.createdAt|date('d/m/Y') }}</span>
+        {% if figure.updatedAt is not null %}
+            <span class="badge bg-secondary">Modifié le : {{ figure.updatedAt|date('d/m/Y') }}</span>
+        {% endif %}
+        <span class="badge bg-info">Auteur : {{ figure.user.fullName }}</span>
+    </div>
+
+</div>
