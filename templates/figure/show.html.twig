@@ -8,12 +8,12 @@
 
         {% if app.user %}
             <div class="position-absolute px-2 py-1 m-4 z-1 border border-black bg-light top-0 end-0 d-flex align-items-center">
-                <a href="{{ path('app_figure_edit', {'id': figure.id}) }}" class="text-decoration-none me-2">
+                <a href="{{ path('app_figure_edit', {'slug': figure.slug}) }}" class="text-decoration-none me-2">
                     <i class="fa-solid fa-pen"></i>
                 </a>
-                <form method="post" action="{{ path('app_figure_delete', {'id': figure.id}) }}" class="d-inline">
+                <form method="post" action="{{ path('app_figure_delete', {'slug': figure.slug}) }}" class="d-inline">
                     <input type="hidden" name="_method" value="DELETE">
-                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ figure.id) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ figure.slug) }}">
                     <button type="submit" class="text-dark p-0 border-0 bg-transparent">
                         <i class="fa-solid fa-trash text-danger"></i>
                     </button>

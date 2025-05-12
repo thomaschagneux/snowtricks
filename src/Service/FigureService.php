@@ -8,12 +8,14 @@ use App\Form\FigureType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class FigureService
 {
     public function __construct(
         private readonly FormFactoryInterface $formFactory,
         private readonly EntityManagerInterface $entityManager,
+        private readonly SluggerInterface $slugger,
     ) {
     }
 
@@ -29,8 +31,13 @@ class FigureService
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var Figure $data */
             $data = $form->getData();
+            if (null === $data->getName()) {
+                throw new \Exception('Le nom de la figure est obligatoire.');
+            }
+            $slug = $this->slugger->slug($data->getName());
             $data->setFeaturedMedia($figure->getFeaturedMedia());
             $data->setMediaCollection($figure->getMedia());
+            $data->setSlug($slug);
             $this->entityManager->persist($data);
             $this->entityManager->flush();
         }

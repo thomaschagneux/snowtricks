@@ -44,6 +44,9 @@ class Figure extends AbstractEntity
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'figure')]
     private Collection $comments;
 
+    #[ORM\Column(type: Types::STRING, length: 255)]
+    private string $slug;
+
     public function __construct()
     {
         parent::__construct();
@@ -193,5 +196,15 @@ class Figure extends AbstractEntity
         }
 
         return $this;
+    }
+
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): void
+    {
+        $this->slug = $slug;
     }
 }

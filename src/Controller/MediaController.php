@@ -145,7 +145,7 @@ final class MediaController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_media_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'app_media_delete', methods: ['POST'])]
     public function delete(Request $request, Media $medium, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$medium->getId(), $request->getPayload()->getString('_token'))) {
@@ -153,7 +153,7 @@ final class MediaController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_media_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
     }
 
     private function getReadableNameFromMimeType(string $mimeType): string
