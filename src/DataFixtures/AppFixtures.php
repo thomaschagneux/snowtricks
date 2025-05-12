@@ -99,6 +99,7 @@ class AppFixtures extends Fixture
             $figure = new Figure();
             $figure->setUser($user);
             $figure->setName(' Nom figure '.$i);
+            $figure->setSlug('nom-figure-'.$i);
             $figure->setFigureGroup($figureGroups[$i]);
             $figure->setMediaCollection($mediaCollection);
             $figure->setFeaturedMedia($medias[$i]);

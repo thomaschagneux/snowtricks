@@ -23,20 +23,44 @@ final class FigureController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly MediaService $mediaService,
+        private readonly FigureService $figureService,
     ) {
     }
 
-    #[Route('/new', name: 'app_figure_new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    #[Route('/add', name: 'app_figure_add', methods: ['GET', 'POST'])]
+    public function add(Request $request): RedirectResponse|Response
     {
-        $figure = new Figure();
+        $user = $this->getUser();
+        if ($user instanceof User) {
+            $figure = new Figure();
+            $figureForm = $this->figureService->createFigureForm($figure, $user);
 
-        return $this->handleFigureForm($request, $figure, 'add');
+            $figureForm->handleRequest($request);
+            if ($figureForm->isSubmitted() && $figureForm->isValid()) {
+                $figureService = $this->figureService;
+                $figureService->handlefigureSubmission($figure, $figureForm);
+
+                return $this->redirectToRoute('app_home');
+            }
+
+            return $this->render('figure/new.html.twig', [
+                'form' => $figureForm->createView(),
+            ]);
+        }
+        $this->addFlash('success', 'Vous devez être connecté pour accéder à cette page.');
+
+        return $this->redirectToRoute('app_login');
     }
 
-    #[Route('/{id}', name: 'app_figure_show', methods: ['GET', 'POST'])]
-    public function show(Figure $figure, Request $request, CommentService $commentService): Response
+    #[Route('/{slug}', name: 'app_figure_show', methods: ['GET', 'POST'])]
+    public function show(string $slug, Request $request, CommentService $commentService): Response
     {
+        $figure = $this->entityManager->getRepository(Figure::class)->findOneBy(['slug' => $slug]);
+
+        if (!$figure instanceof Figure) {
+            throw $this->createNotFoundException('La figure n\'existe pas.');
+        }
+
         $mediaData = $this->mediaService->prepareMediaData($figure->getMedia());
         $featuredImage = $this->mediaService->getFeaturedImage($figure);
 
@@ -65,9 +89,15 @@ final class FigureController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_figure_edit', methods: ['GET', 'POST'])]
-    public function edit(Figure $figure, Request $request, FigureService $figureService): Response
+    #[Route('/{slug}/edit', name: 'app_figure_edit', methods: ['GET', 'POST'])]
+    public function edit(string $slug, Request $request, FigureService $figureService): Response
     {
+        $figure = $this->entityManager->getRepository(Figure::class)->findOneBy(['slug' => $slug]);
+
+        if (!$figure instanceof Figure) {
+            throw $this->createNotFoundException('La figure n\'existe pas.');
+        }
+
         $user = $this->getUser();
 
         if ($user instanceof User) {
@@ -85,10 +115,17 @@ final class FigureController extends AbstractController
         return $this->handleFigureForm($request, $figure, 'edit');
     }
 
-    #[Route('/{id}/delete', name: 'app_figure_delete', methods: ['GET', 'POST'])]
-    public function delete(Request $request, Figure $figure): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$figure->getId(), $request->getPayload()->getString('_token'))) {
+    #[Route('/{slug}/delete', name: 'app_figure_delete', methods: ['GET', 'POST'])]
+    public function delete(
+        Request $request,
+        string $slug,
+    ): Response {
+        $figure = $this->entityManager->getRepository(Figure::class)->findOneBy(['slug' => $slug]);
+
+        if (!$figure instanceof Figure) {
+            throw $this->createNotFoundException('La figure n\'existe pas.');
+        }
+        if ($this->isCsrfTokenValid('delete'.$figure->getSlug(), $request->getPayload()->getString('_token'))) {
             $comments = $figure->getComments();
             foreach ($comments as $comment) {
                 $this->entityManager->remove($comment);
@@ -96,6 +133,8 @@ final class FigureController extends AbstractController
 
             $this->entityManager->remove($figure);
             $this->entityManager->flush();
+        } else {
+            throw $this->createNotFoundException('Le token est invalide, veuillez rafraichir la page et rééssayer.');
         }
 
         return $this->redirectToRoute('app_home', []);

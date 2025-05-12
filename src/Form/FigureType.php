@@ -19,6 +19,7 @@ class FigureType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Nom',
+                'required' => true,
                 'attr' => [
                     'class' => 'form-control',
                 ],
@@ -63,7 +64,8 @@ class FigureType extends AbstractType
                     'attr' => [
                         'class' => 'form-control',
                     ],
-                ]);
+                ])
+            ;
         }
     }
 

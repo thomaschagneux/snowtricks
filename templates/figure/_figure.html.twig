@@ -11,21 +11,38 @@
     <div class="card-body">
         <div class="row">
             <div class="col col-12 col-md-9 p-0">
-                <a href="{{ path('app_figure_show', {'id': figure.id}) }}">{{ figure.name }}</a>
+                <a href="{{ path('app_figure_show', {'slug': figure.slug}) }}">{{ figure.name }}</a>
             </div>
             <div class="col col-12 col-md-1 p-0 m-auto">
-                <a href="{{ path('app_figure_edit', {'id': figure.id}) }}" class="text-dark"><i class="fa-solid fa-pen"></i></a>
+                <a href="{{ path('app_figure_edit', {'slug': figure.slug}) }}" class="text-dark"><i class="fa-solid fa-pen"></i></a>
             </div>
-            <div class="col col-12 col-md-1 p-0">
-                <form method="post" action="{{ path('app_figure_delete', {'id': figure.id}) }}">
-                    <input type="hidden" name="_method" value="DELETE">
-                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ figure.id) }}">
-                    <button class="text-dark p-0 border-0 bg-transparent">
-                        <i class="fa-solid fa-trash text-danger"></i>
-                    </button>
-                </form>
 
+            <div class="col col-12 col-md-1 p-0 m-auto">
+                <button type="button" class="bg-transparent border-0 text-danger" data-bs-toggle="modal" data-bs-target="#modal-figure-{{ figure.slug }}">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
             </div>
+
+            <div class="modal fade" id="modal-figure-{{ figure.slug }}" tabindex="-1" aria-labelledby="modal-figure-{{ figure.slug }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="modal-figure-{{ figure.slug }}">Êtes-vous sûr de vouloir supprimer la figure {{ figure.name }}?</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <form method="post" action="{{ path('app_figure_delete', {'slug': figure.slug}) }}">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ figure.slug) }}">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
