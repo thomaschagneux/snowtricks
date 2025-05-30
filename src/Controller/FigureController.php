@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Figure;
 use App\Entity\User;
 use App\Form\FigureType;
+use App\Repository\FigureRepository;
 use App\Service\CommentService;
 use App\Service\FigureService;
 use App\Service\MediaService;
@@ -12,12 +13,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/figure')]
 final class FigureController extends AbstractController
 {
     public function __construct(
@@ -27,7 +28,7 @@ final class FigureController extends AbstractController
     ) {
     }
 
-    #[Route('/add', name: 'app_figure_add', methods: ['GET', 'POST'])]
+    #[Route('/figure/add', name: 'app_figure_add', methods: ['GET', 'POST'])]
     public function add(Request $request): RedirectResponse|Response
     {
         $user = $this->getUser();
@@ -52,7 +53,7 @@ final class FigureController extends AbstractController
         return $this->redirectToRoute('app_login');
     }
 
-    #[Route('/{slug}', name: 'app_figure_show', methods: ['GET', 'POST'])]
+    #[Route('/figure/{slug}/show', name: 'app_figure_show', methods: ['GET', 'POST'])]
     public function show(string $slug, Request $request, CommentService $commentService): Response
     {
         $figure = $this->entityManager->getRepository(Figure::class)->findOneBy(['slug' => $slug]);
@@ -89,7 +90,7 @@ final class FigureController extends AbstractController
         ]);
     }
 
-    #[Route('/{slug}/edit', name: 'app_figure_edit', methods: ['GET', 'POST'])]
+    #[Route('/figure/{slug}/edit', name: 'app_figure_edit', methods: ['GET', 'POST'])]
     public function edit(string $slug, Request $request, FigureService $figureService): Response
     {
         $figure = $this->entityManager->getRepository(Figure::class)->findOneBy(['slug' => $slug]);
@@ -115,7 +116,7 @@ final class FigureController extends AbstractController
         return $this->handleFigureForm($request, $figure, 'edit');
     }
 
-    #[Route('/{slug}/delete', name: 'app_figure_delete', methods: ['GET', 'POST'])]
+    #[Route('/figure/{slug}/delete', name: 'app_figure_delete', methods: ['GET', 'POST'])]
     public function delete(
         Request $request,
         string $slug,
@@ -138,6 +139,36 @@ final class FigureController extends AbstractController
         }
 
         return $this->redirectToRoute('app_home', []);
+    }
+
+    #[Route('/figure/ajax-all', name: 'app_figures_ajax', methods: ['GET'])]
+    public function getFiguresAjax(FigureRepository $figureRepository): JsonResponse
+    {
+        $figures = $figureRepository->findAll();
+        $data = [];
+
+        foreach ($figures as $figure) {
+            $data[] = [
+                'id' => $figure->getId(),
+                'name' => $figure->getName(),
+                'slug' => $figure->getSlug(),
+            ];
+        }
+
+        return new JsonResponse($data);
+    }
+
+    #[Route('/figure/{slug}/ajax-one', name: 'app_figure_html', methods: ['GET'])]
+    public function getFigureHtml(string $slug, FigureRepository $figureRepository): Response
+    {
+        $figure = $figureRepository->findOneBy(['slug' => $slug]);
+        if (!$figure) {
+            throw $this->createNotFoundException('The figure does not exist');
+        }
+
+        return $this->render('figure/_figure.html.twig', [
+            'figure' => $figure,
+        ]);
     }
 
     private function handleFigureForm(Request $request, Figure $figure, ?string $action): RedirectResponse|Response
