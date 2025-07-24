@@ -1,0 +1,11 @@
+id,path,url,media_type_id
+1,uploads/users/alex.jpg,,1
+2,uploads/users/marie.png,,1
+3,uploads/figures/ollie.jpg,,1
+4,,https://www.example.com/videos/method_grab.mp4,2
+5,uploads/figures/misty_flip.jpg,,1
+6,uploads/figures/tail_press.jpg,,1
+7,uploads/figures/indy_grab.jpg,,1
+8,,https://www.example.com/videos/backflip.mp4,2
+9,uploads/figures/board_slide.jpg,,1
+10,uploads/figures/nollie_180.jpg,,1

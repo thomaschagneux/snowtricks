@@ -1,0 +1,4 @@
+id,email,roles,password,picture_id,first_name,last_name
+1,alex.rider@example.com,"[""ROLE_USER""]",$2y$10$eKMKnIP0wNQ6NLAGAYKYu.xXe7WB1Ok7PB9QQlTLvN7kZu6fWjPtW,1,Alex,Rider
+2,mj.rider@example.com,"[""ROLE_USER""]",$2y$10$eKMKnIP0wNQ6NLAGAYKYu.xXe7WB1Ok7PB9QQlTLvN7kZu6fWjPtW,2,Marie,Joly
+3,admin@snowapp.com,"[""ROLE_ADMIN""]",$2y$10$eKMKnIP0wNQ6NLAGAYKYu.xXe7WB1Ok7PB9QQlTLvN7kZu6fWjPtW,,Admin,Root

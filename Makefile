@@ -12,15 +12,15 @@ help: ## Affiche cette aide
 
 install: ## Installe les dépendances du projet
 	$(COMPOSER) install
-	$(CONSOLE) d:d:c --if-not-exists
-	$(CONSOLE) d:m:m --no-interaction
-	$(CONSOLE) d:f:l --no-interaction
+	$(CONSOLE) doctrine:database:create --if-not-exists
+	$(CONSOLE) doctrine:migrations:migrate --no-interaction
+	$(CONSOLE) doctrine:fixtures:load --no-interaction
 
 reset:
-	$(CONSOLE) d:d:d --force
-	$(CONSOLE) d:d:c --if-not-exists
-	$(CONSOLE) d:m:m --no-interaction
-	$(CONSOLE) d:f:l --no-interaction
+	$(CONSOLE) doctrine:database:drop --force
+	$(CONSOLE) doctrine:database:create --if-not-exists
+	$(CONSOLE) doctrine:migrations:migrate --no-interaction
+	$(CONSOLE) doctrine:fixtures:load --no-interaction
 
 start: ## Démarre le serveur Symfony
 	$(SYMFONY_SERVER) -d
@@ -29,8 +29,8 @@ stop: ## Stoppe le serveur Symfony
 	$(SYMFONY_SERVER) stop
 
 clean: ## Nettoie les fichiers de cache et logs
-	$(CONSOLE) c:c
-	$(CONSOLE) c:w
+	$(CONSOLE) cache:clear
+	$(CONSOLE) cache:warm
 
 quality: clean
 	vendor/bin/php-cs-fixer fix

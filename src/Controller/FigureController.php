@@ -120,24 +120,30 @@ final class FigureController extends AbstractController
         Request $request,
         string $slug,
     ): Response {
-        $figure = $this->entityManager->getRepository(Figure::class)->findOneBy(['slug' => $slug]);
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            $figure = $this->entityManager->getRepository(Figure::class)->findOneBy(['slug' => $slug]);
 
-        if (!$figure instanceof Figure) {
-            throw $this->createNotFoundException('La figure n\'existe pas.');
-        }
-        if ($this->isCsrfTokenValid('delete'.$figure->getSlug(), $request->getPayload()->getString('_token'))) {
-            $comments = $figure->getComments();
-            foreach ($comments as $comment) {
-                $this->entityManager->remove($comment);
+            if (!$figure instanceof Figure) {
+                throw $this->createNotFoundException('La figure n\'existe pas.');
+            }
+            if ($this->isCsrfTokenValid('delete'.$figure->getSlug(), $request->getPayload()->getString('_token'))) {
+                $comments = $figure->getComments();
+                foreach ($comments as $comment) {
+                    $this->entityManager->remove($comment);
+                }
+
+                $this->entityManager->remove($figure);
+                $this->entityManager->flush();
+            } else {
+                throw $this->createNotFoundException('Le token est invalide, veuillez rafraichir la page et rééssayer.');
             }
 
-            $this->entityManager->remove($figure);
-            $this->entityManager->flush();
-        } else {
-            throw $this->createNotFoundException('Le token est invalide, veuillez rafraichir la page et rééssayer.');
+            return $this->redirectToRoute('app_home', []);
         }
+        $this->addFlash('error', 'Vous devez être connecté pour effectuer cette action.');
 
-        return $this->redirectToRoute('app_home', []);
+        return $this->redirectToRoute('app_login');
     }
 
     private function handleFigureForm(Request $request, Figure $figure, ?string $action): RedirectResponse|Response
