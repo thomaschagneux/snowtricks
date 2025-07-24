@@ -1,0 +1,11 @@
+id,name,short_description,content,figure_group_id,user_id,featured_media_id,created_at,updated_at,slug
+1,Ollie,Saut de base,Tech de base: pop tail pour décoller sans rampe.,1,1,3,2025-01-01 10:00:00,2025-01-01 10:00:00,ollie
+2,Nollie,Ollie depuis le nose,"Comme un ollie mais avec le nez, migration du poids vers l’avant.",1,2,10,2025-01-01 10:00:00,2025-01-01 10:00:00,nollie
+3,Tail Press,Butters sur la queue,"Appui sur le tail, nose levé, glisse stylée.",2,1,6,2025-01-01 10:00:00,2025-01-01 10:00:00,tail-press
+4,50/50,Slide rail de base,"Slide flat sur rail ou boîte, planche parallèle.",5,2,2,2025-01-01 10:00:00,2025-01-01 10:00:00,50-50
+5,Indy Grab,Grab classique arrière,Main arrière attrape la toe‑edge entre les pieds mid‑air.,3,1,7,2025-01-01 10:00:00,2025-01-01 10:00:00,indy-grab
+6,Method Grab,Grab stylisé,"Main arrière saisit le talon, board tweakée backside.",3,1,4,2025-01-01 10:00:00,2025-01-01 10:00:00,method-grab
+7,Melon Grab,Grab devant,Main avant attrape la heel‑edge entre les pieds.,3,2,5,2025-01-01 10:00:00,2025-01-01 10:00:00,melon-grab
+8,Backflip,Flip arrière complet,Somersault arrière en l’air; landing switch ou régulier.,4,2,8,2025-01-01 10:00:00,2025-01-01 10:00:00,backflip
+9,Misty Flip,Flip off‑axis backside 540,"Rotation backside 540 désaxée, named trick freestyle.",4,1,1,2025-01-01 10:00:00,2025-01-01 10:00:00,misty-flip
+10,Frontside Board Slide,Slide boardside sur rail,Slide 90° frontside sur rail.,5,2,9,2025-01-01 10:00:00,2025-01-01 10:00:00,frontside-board-slide
