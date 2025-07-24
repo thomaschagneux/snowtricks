@@ -20,6 +20,7 @@ reset:
 	$(CONSOLE) doctrine:database:drop --force
 	$(CONSOLE) doctrine:database:create --if-not-exists
 	$(CONSOLE) doctrine:migrations:migrate --no-interaction
+	$(CONSOLE) doctrine:fixtures:load --no-interaction
 
 start: ## Démarre le serveur Symfony
 	$(SYMFONY_SERVER) -d
