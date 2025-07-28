@@ -6,14 +6,19 @@ namespace App\Service;
 
 use App\Entity\Figure;
 use App\Entity\Media;
+use App\Entity\MediaType;
 use App\Entity\User;
+use App\Repository\MediaTypeRepository;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Asset\Packages;
 
 class MediaService
 {
     public function __construct(
         private readonly Packages $assetsManager,
+        private readonly MediaTypeRepository $mediaTypeRepository,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -167,5 +172,32 @@ class MediaService
             </svg>',
             $initials
         );
+    }
+
+    public function setMediaType(Media $mediaEntity, string $mimeType): void
+    {
+        $mediaType = $this->mediaTypeRepository->findOneBy(['mimeType' => $mimeType]);
+        if (!$mediaType) {
+            $mediaType = new MediaType();
+            $mediaType->setMimeType($mimeType);
+            $mediaType->setName($this->getReadableNameFromMimeType($mimeType));
+            $this->entityManager->persist($mediaType);
+            $this->entityManager->flush();
+        }
+        $mediaEntity->setMediaType($mediaType);
+    }
+
+    private function getReadableNameFromMimeType(string $mimeType): string
+    {
+        $mimeMapping = [
+            'image/jpeg' => 'Image JPEG',
+            'image/png' => 'Image PNG',
+            'image/gif' => 'Image GIF',
+            'video/mp4' => 'Vidéo MP4',
+            'video/mpeg' => 'Vidéo MPEG',
+            'audio/mpeg' => 'Audio MP3',
+        ];
+
+        return $mimeMapping[$mimeType] ?? 'Autre';
     }
 }

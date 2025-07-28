@@ -3,13 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Figure;
+use App\Entity\Media;
 use App\Entity\User;
 use App\Form\FigureType;
 use App\Service\CommentService;
 use App\Service\FigureService;
 use App\Service\MediaService;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -38,8 +37,8 @@ final class FigureController extends AbstractController
             $figureForm->handleRequest($request);
             if ($figureForm->isSubmitted() && $figureForm->isValid()) {
                 $figureService = $this->figureService;
-                $figureService->handlefigureSubmission($figure, $figureForm);
-
+                $uploadDirectory = $this->getParameter('kernel.project_dir').'/public/uploads/media';
+                $figureService->handlefigureSubmission($figure, $figureForm, $uploadDirectory);
                 return $this->redirectToRoute('app_home');
             }
 
@@ -105,7 +104,8 @@ final class FigureController extends AbstractController
             $oldFigure = clone $figure;
             $editFigureForm->handleRequest($request);
 
-            $figureService->handlefigureSubmission($oldFigure, $editFigureForm);
+            $uploadDirectory = $this->getParameter('kernel.project_dir').'/public/uploads/media';
+            $figureService->handlefigureSubmission($oldFigure, $editFigureForm, $uploadDirectory);
         } else {
             $this->addFlash('error', 'Vous devez être connecté pour modifier une figure.');
 
@@ -121,7 +121,7 @@ final class FigureController extends AbstractController
         string $slug,
     ): Response {
         $user = $this->getUser();
-        if (!$user instanceof User) {
+        if ($user instanceof User) {
             $figure = $this->entityManager->getRepository(Figure::class)->findOneBy(['slug' => $slug]);
 
             if (!$figure instanceof Figure) {
@@ -161,14 +161,71 @@ final class FigureController extends AbstractController
                 $figure->setUser($user);
             }
 
-            if ('edit' !== $action) {
-                $formMediaData = $form->get('media')->getData();
+            // Handle new media upload
+            if ($form->has('newMedia')) {
+                $newMedia = $form->get('newMedia')->getData();
+                if ($newMedia instanceof Media) {
+                    $file = $form->get('newMedia')->get('file')->getData();
+                    $url = $newMedia->getUrl();
 
-                if (null === $formMediaData) {
-                    $formMediaData = [];
+                    if ($file || $url) {
+                        $media = new Media();
+
+                        if ($file) {
+                            $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                            $safeFilename = $this->slugger->slug($originalFilename);
+                            $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+
+                            $filesDirectory = $this->getParameter('kernel.project_dir').'/public/uploads/media';
+                            $file->move($filesDirectory, $newFilename);
+                            $media->setPath('uploads/media/'.$newFilename);
+
+                            $mimeType = $file->getClientMimeType();
+                            $this->mediaService->setMediaType($media, $mimeType);
+                        } elseif ($url) {
+                            $media->setUrl($url);
+                            $mimeType = $this->mediaService->guessMimeTypeFromUrl($url);
+                            $this->mediaService->setMediaType($media, $mimeType);
+                        }
+
+                        $this->entityManager->persist($media);
+                        $figure->addMedium($media);
+                    }
                 }
-                $medias = $formMediaData instanceof Collection ? $formMediaData : new ArrayCollection(is_array($formMediaData) ? $formMediaData : []);
-                $figure->setMediaCollection($medias);
+            }
+
+
+            // Handle new featured media upload
+            if ($form->has('newFeaturedMedia')) {
+                $newFeaturedMedia = $form->get('newFeaturedMedia')->getData();
+                if ($newFeaturedMedia instanceof Media) {
+                    $file = $form->get('newFeaturedMedia')->get('file')->getData();
+                    $url = $newFeaturedMedia->getUrl();
+
+                    if ($file || $url) {
+                        $media = new Media();
+
+                        if ($file) {
+                            $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                            $safeFilename = $this->slugger->slug($originalFilename);
+                            $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+
+                            $filesDirectory = $this->getParameter('kernel.project_dir').'/public/uploads/media';
+                            $file->move($filesDirectory, $newFilename);
+                            $media->setPath('uploads/media/'.$newFilename);
+
+                            $mimeType = $file->getClientMimeType();
+                            $this->mediaService->setMediaType($media, $mimeType);
+                        } elseif ($url) {
+                            $media->setUrl($url);
+                            $mimeType = $this->mediaService->guessMimeTypeFromUrl($url);
+                            $this->mediaService->setMediaType($media, $mimeType);
+                        }
+
+                        $this->entityManager->persist($media);
+                        $figure->setFeaturedMedia($media);
+                    }
+                }
             }
 
             $this->entityManager->persist($figure);
@@ -182,6 +239,7 @@ final class FigureController extends AbstractController
             'form' => $form->createView(),
             'featuredImage' => $featuredImage,
             'medias' => $mediaData,
+            'form-action' => $action,
         ]);
     }
 }

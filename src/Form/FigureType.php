@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Entity\Figure;
 use App\Entity\FigureGroup;
-use App\Entity\Media;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -45,25 +44,17 @@ class FigureType extends AbstractType
                 ],
             ]);
 
-        if ('edit' !== $options['action']) {
+        if ('add' == $options['action']) {
             $builder
-                ->add('media', EntityType::class, [
-                    'label' => 'Media',
-                    'class' => Media::class,
-                    'choice_label' => fn (Media $entity) => $entity->getPath() ?: $entity->getUrl(),
-                    'multiple' => true,
-                    'attr' => [
-                        'class' => 'form-control',
-                    ],
+                ->add('newMedia', MediaType::class, [
+                    'label' => 'Ajouter un média',
+                    'mapped' => false,
+                    'required' => false,
                 ])
-                ->add('featuredMedia', EntityType::class, [
-                    'label' => 'Featured media',
-                    'class' => Media::class,
-                    'choice_label' => fn (Media $entity) => $entity->getPath() ?: $entity->getUrl(),
-                    'multiple' => false,
-                    'attr' => [
-                        'class' => 'form-control',
-                    ],
+                ->add('newFeaturedMedia', MediaType::class, [
+                    'label' => 'Ajouter un média à la une',
+                    'mapped' => false,
+                    'required' => false,
                 ])
             ;
         }
