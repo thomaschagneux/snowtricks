@@ -8,7 +8,7 @@
 
             {% if figure is defined %}
                 {% if app.user %}
-                    {% if figure.featuredMedia is defined and not null %}
+                    {% if figure.featuredMedia is defined and figure.featuredMedia is not null %}
                         <div class="position-absolute px-2 py-1 m-4 z-1 border border-black bg-light top-0 end-0 d-flex align-items-center">
 
                             <a href="{{ path('app_media_edit', {'id': figure.featuredMedia.id}) }}" class="text-decoration-none me-2">
@@ -152,7 +152,7 @@
                                     <form method="post" action="{{ path('app_figure_delete', {'slug': figure.slug}) }}">
                                         <input type="hidden" name="_method" value="DELETE">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ figure.slug) }}">
-                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                        <button type="submit" class="btn btn-danger">Supprimer</button>
                                     </form>
                                 </div>
                             </div>

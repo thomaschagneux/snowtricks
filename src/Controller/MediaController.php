@@ -81,8 +81,8 @@ final class MediaController extends AbstractController
 
             $response = new Response();
             $response->setContent('<html><body><script>alert("Le formulaire a été soumis avec succès. Vous pouvez fermer cet onglet.");</script></body></html>');
-            return $response;
 
+            return $response;
         }
 
         return $this->render('media/new.html.twig', [
@@ -141,7 +141,10 @@ final class MediaController extends AbstractController
 
             $successMessage = 'Le formulaire a bien été validé';
 
-            return $this->redirectToRoute('app_media_index');
+            $response = new Response();
+            $response->setContent('<html><body><script>alert("Le formulaire a été soumis avec succès. Vous pouvez fermer cet onglet.");</script></body></html>');
+
+            return $response;
         }
 
         return $this->render('media/edit.html.twig', [

@@ -1,6 +1,1 @@
-@media (min-width: 992px) {  /* Pour les écrans larges */
-    .col-lg-2-4 {
-        flex: 0 0 20%;  /* Force 20% de largeur */
-        max-width: 20%;
-    }
-}
+
