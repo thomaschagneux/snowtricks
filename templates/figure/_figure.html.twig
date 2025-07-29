@@ -1,7 +1,9 @@
 <div class="card card-figure">
     <div class="card-header" style="height: 200px; overflow: hidden;"> {# Hauteur fixe pour le header #}
 
-        {% if figure.media is not empty %}
+        {% if figure.featuredMedia is not null %}
+            {% set link = figure.featuredMedia.path ? figure.featuredMedia.path : figure.featuredMedia.url %}
+        {% elseif figure.media is not empty %}
             {% set link = figure.media.first.path ? figure.media.first.path : figure.media.first.url %}
         {% endif %}
         <img src="{{ asset(link ?? '') }}" alt="image failed to load"
