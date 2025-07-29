@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Figure;
 use App\Entity\Media;
 use App\Entity\MediaType;
 use App\Form\MediaType as FileType;
@@ -35,8 +36,9 @@ final class MediaController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_media_new', methods: ['GET', 'POST'])]
+    #[Route('/new/{id}', name: 'app_media_new', methods: ['GET', 'POST'])]
     public function new(
+        Figure $figure,
         Request $request,
         #[Autowire('%kernel.project_dir%/public/uploads/media')] string $filesDirectory,
     ): Response {
@@ -71,13 +73,16 @@ final class MediaController extends AbstractController
 
                 return new Response($errorMessage, Response::HTTP_BAD_REQUEST);
             }
-
+            $figure->addMedium($medium);
             $this->entityManager->persist($medium);
             $this->entityManager->flush();
 
             $successMessage = 'Le formulaire a bien été validé';
 
-            return $this->redirectToRoute('app_media_index');
+            $response = new Response();
+            $response->setContent('<html><body><script>alert("Le formulaire a été soumis avec succès. Vous pouvez fermer cet onglet.");</script></body></html>');
+
+            return $response;
         }
 
         return $this->render('media/new.html.twig', [
@@ -136,7 +141,10 @@ final class MediaController extends AbstractController
 
             $successMessage = 'Le formulaire a bien été validé';
 
-            return $this->redirectToRoute('app_media_index');
+            $response = new Response();
+            $response->setContent('<html><body><script>alert("Le formulaire a été soumis avec succès. Vous pouvez fermer cet onglet.");</script></body></html>');
+
+            return $response;
         }
 
         return $this->render('media/edit.html.twig', [

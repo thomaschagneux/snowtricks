@@ -1,7 +1,9 @@
 <div class="card card-figure">
     <div class="card-header" style="height: 200px; overflow: hidden;"> {# Hauteur fixe pour le header #}
 
-        {% if figure.media is not empty %}
+        {% if figure.featuredMedia is not null %}
+            {% set link = figure.featuredMedia.path ? figure.featuredMedia.path : figure.featuredMedia.url %}
+        {% elseif figure.media is not empty %}
             {% set link = figure.media.first.path ? figure.media.first.path : figure.media.first.url %}
         {% endif %}
         <img src="{{ asset(link ?? '') }}" alt="image failed to load"
@@ -15,7 +17,7 @@
             </div>
             {% if app.user is not null %}
             <div class="col col-12 col-md-1 p-0 m-auto">
-                <a href="{{ path('app_figure_edit', {'slug': figure.slug}) }}" class="text-dark"><i class="fa-solid fa-pen"></i></a>
+                <a href="{{ path('app_figure_edit', {'slug': figure.slug}) }}" class="text-dark" target="_blank"><i class="fa-solid fa-pen"></i></a>
             </div>
 
             <div class="col col-12 col-md-1 p-0 m-auto">
